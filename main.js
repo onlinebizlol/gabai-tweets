@@ -91,7 +91,7 @@ function tweetGabs(gabs) {
 
   // just bein explicit with the args
   tweetGab(parts, undefined);
-  // tweetGabs(gabs);
+  tweetGabs(gabs);
 }
 
 function getPopularAndTweet() {
