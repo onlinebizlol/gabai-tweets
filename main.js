@@ -2,6 +2,8 @@
 
 var Twitter = require('twitter');
 var Opts = require('commander');
+var https = require('https');
+var truncate = require('lodash.truncate');
 
 Opts.version('0.0.1')
   .option('-v, --verbose', 'Log some debug info to the console')
@@ -15,25 +17,105 @@ var twitterClient = new Twitter({
   access_token_secret: process.env.TWITTER_ACCESS_TOKEN_SECRET
 });
 
+var options = {
+    host: 'gab.ai',
+    path: '/feed/popular/today',
+    headers: {
+        'Authorization': 'Bearer ' + process.env.GABAI_AUTH
+    }
+};
+
 // Verify the credentials
 twitterClient.get('/account/verify_credentials', function(error, data, response) {
 
   if(Opts.verbose) {
-    console.info("verify_credentials: " + JSON.stringify(response));
+    console.info('verify_credentials: ' + JSON.stringify(data));
   }
 
 });
 
-// Connect to the stream
-twitterClient.stream('statuses/sample', {}, function(stream) {
-  stream.on('data', function(data) {
+function tweetGab(splitStatus, replyId) {
+  var statusToTweet = splitStatus.shift();
+  var params = {
+    status: statusToTweet
+  };
 
-    if(Opts.verbose) {
-      console.info("stream data: " + JSON.stringify(data));
+  if(!statusToTweet) {
+    return;
+  }
+
+  if(replyId) {
+    params.in_reply_to_status_id = replyId;
+    statusToTweet = statusToTweet + '\n@gabai_tweets';
+  }
+
+  twitterClient.post('statuses/update', params,  function(error, tweet, response) {
+    if(error) {
+      console.error('[ERROR] tweetGab: ', error);
     }
 
+    console.log(statusToTweet);
+    tweetGab(splitStatus, tweet.id_str);
   });
-});
+}
+
+function tweetGabs(gabs) {
+  var gabToTweet = gabs.shift();
+
+  if(!gabToTweet) {
+    return;
+  }
+
+  var statusToTweet = gabToTweet.post.user.name + ' (#' + gabToTweet.post.user.username + '):\n' + gabToTweet.post.body.replace(/@/g, '#');
+
+  var parts = [];
+  var firstPart = truncate(statusToTweet, {
+    'length': 140,
+    'omission': '',
+    'separator': /\s/
+  });
+  parts.push(firstPart);
+
+  var restOfTweet = statusToTweet.substr(firstPart.length);
+  while(restOfTweet.length) {
+    var nextPart = truncate(restOfTweet, {
+      'length': 126,
+      'omission': '',
+      'separator': /\s/
+    });
+    parts.push(nextPart);
+    restOfTweet = restOfTweet.substr(nextPart.length);
+  }
+
+  console.log(statusToTweet, parts)
+
+  // just bein explicit with the args
+  tweetGab(parts, undefined);
+  // tweetGabs(gabs);
+}
+
+function getPopularAndTweet() {
+  https.get(options, function(res) {
+
+    res.setEncoding('utf8');
+    let rawData = '';
+    res.on('data', (chunk) => rawData += chunk);
+    res.on('end', () => {
+      let parsedData = JSON.parse(rawData);
+      tweetGabs(parsedData.data)
+
+      if(Opts.verbose) {
+        console.log('Got response: ', parsedData);
+      }
+    });
+
+  }).on('error', function(e) {
+    console.error('Error fetching data from gab.ai: ', e);
+  });
+}
+
+getPopularAndTweet();
+setInterval(getPopularAndTweet, 1000 * 60 * 60 * 24)
 
 // Handle exit signals
 process.on('SIGINT', function(){
@@ -41,5 +123,5 @@ process.on('SIGINT', function(){
 });
 
 process.on('exit', function(){
-  process.stdout.write("Exiting...");
+  process.stdout.write('Exiting...');
 });

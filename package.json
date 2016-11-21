@@ -2,17 +2,18 @@
   "name": "twitter-bot-boilerplate",
   "version": "0.0.1",
   "description": "A template for creating bots that interact with the Twitter API.",
-  "repository" : {
-    "type" : "git",
-    "url" : "http://github.com/mhgbrown/twitter-bot-boilerplate.git"
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/mhgbrown/twitter-bot-boilerplate.git"
   },
   "license": "MIT",
   "engines": {
-    "node": "^5.0.0",
-    "npm": "^3.3.12"
+    "node": "^6.0.0",
+    "npm": "^4.0.0"
   },
   "dependencies": {
     "commander": "^2.0.0",
+    "lodash.truncate": "^4.4.2",
     "twitter": "^1.0.0"
   },
   "scripts": {
