@@ -1,10 +1,10 @@
 {
-  "name": "twitter-bot-boilerplate",
+  "name": "gabai-tweets",
   "version": "0.0.1",
-  "description": "A template for creating bots that interact with the Twitter API.",
+  "description": "Tweets popular gabs from gab.ai daily",
   "repository": {
     "type": "git",
-    "url": "http://github.com/mhgbrown/twitter-bot-boilerplate.git"
+    "url": "http://github.com/onlinebizlol/gabai-tweets.git"
   },
   "license": "MIT",
   "engines": {
