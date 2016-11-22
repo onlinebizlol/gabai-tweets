@@ -1,5 +1,14 @@
 #!/usr/bin/env node
 
+/*
+  references:
+    https://github.com/mhgbrown/twitter-bot-boilerplate
+    https://dev.twitter.com/rest/reference/post/statuses/update
+  TODO:
+    prevent retweeting same stuff by logging if we've tweeted for today
+    tweet "in order" so it's easier to scan the feed
+*/
+
 var Twitter = require('twitter');
 var Opts = require('commander');
 var https = require('https');
