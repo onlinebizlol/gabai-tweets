@@ -4,6 +4,7 @@
   references:
     https://github.com/mhgbrown/twitter-bot-boilerplate
     https://dev.twitter.com/rest/reference/post/statuses/update
+    https://devcenter.heroku.com/articles/node-best-practices#avoid-garbage
   TODO:
     do whole login flow
     prevent retweeting same stuff by logging if we've tweeted for today
