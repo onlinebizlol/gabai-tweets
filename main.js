@@ -59,12 +59,19 @@ function tweetGab(splitStatus, replyId) {
     statusToTweet = statusToTweet + '\n@gabai_tweets';
   }
 
+  if(Opts.verbose) {
+    console.info('about to tweet: ', params);
+  }
+
   twitterClient.post('statuses/update', params,  function(error, tweet, response) {
     if(error) {
       console.error('[ERROR] tweetGab: ', error);
     }
 
-    console.log(statusToTweet);
+    if(Opts.verbose) {
+      console.info(statusToTweet);
+    }
+
     tweetGab(splitStatus, tweet.id_str);
   });
 }
@@ -97,11 +104,16 @@ function tweetGabs(gabs) {
     restOfTweet = restOfTweet.substr(nextPart.length);
   }
 
-  console.log(statusToTweet, parts)
+  if(Opts.verbose) {
+    console.info(parts);
+  }
+
 
   // just bein explicit with the args
   tweetGab(parts, undefined);
-  tweetGabs(gabs);
+  setTimeout(function() {
+    tweetGabs(gabs);
+  }, 30 * 1000);
 }
 
 function getPopularAndTweet() {
@@ -125,7 +137,7 @@ function getPopularAndTweet() {
 }
 
 getPopularAndTweet();
-setInterval(getPopularAndTweet, 1000 * 60 * 60 * 24)
+setInterval(getPopularAndTweet, 1000 * 60 * 60 * 24);
 
 // Handle exit signals
 process.on('SIGINT', function(){
