@@ -125,11 +125,12 @@ function getPopularAndTweet() {
     res.on('data', (chunk) => rawData += chunk);
     res.on('end', () => {
       let parsedData = JSON.parse(rawData);
-      tweetGabs(parsedData.data)
 
       if(Opts.verbose) {
         console.log('Got response: ', parsedData);
       }
+
+      tweetGabs(parsedData.data);
     });
 
   }).on('error', function(e) {
